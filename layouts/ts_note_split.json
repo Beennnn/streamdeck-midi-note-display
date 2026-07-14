@@ -1,19 +1,19 @@
 {
-  "id": "ts_note_split_v3",
+  "id": "ts_note_split_v4",
   "items": [
     {
       "key": "l_keyboard",
       "type": "pixmap",
-      "rect": [ 120, 18, 76, 64 ],
+      "rect": [ 122, 18, 74, 64 ],
       "enabled": false,
       "zOrder": 10
     },
     {
       "key": "l_note_letter",
       "type": "text",
-      "rect": [ 4, 14, 78, 72 ],
+      "rect": [ 2, 12, 58, 76 ],
       "font": { "size": 42, "weight": 700 },
-      "alignment": "right",
+      "alignment": "center",
       "color": "#FF5A5A",
       "value": "",
       "text-overflow": "clip",
@@ -23,9 +23,9 @@
     {
       "key": "l_note_octave",
       "type": "text",
-      "rect": [ 86, 28, 28, 58 ],
+      "rect": [ 62, 22, 56, 56 ],
       "font": { "size": 30, "weight": 500 },
-      "alignment": "left",
+      "alignment": "center",
       "color": "#33D17A",
       "value": "",
       "text-overflow": "clip",
