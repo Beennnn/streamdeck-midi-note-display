@@ -1,5 +1,5 @@
 {
-  "id": "ts_note_split_v6",
+  "id": "ts_note_split_v7",
   "items": [
     {
       "key": "l_keyboard",
@@ -11,9 +11,9 @@
     {
       "key": "l_note_letter",
       "type": "text",
-      "rect": [ 0, 4, 88, 92 ],
+      "rect": [ 0, 4, 60, 92 ],
       "font": { "size": 60, "weight": 700 },
-      "alignment": "left",
+      "alignment": "right",
       "color": "#FF5A5A",
       "value": "",
       "text-overflow": "clip",
@@ -23,7 +23,7 @@
     {
       "key": "l_note_octave",
       "type": "text",
-      "rect": [ 90, 4, 32, 92 ],
+      "rect": [ 62, 4, 34, 92 ],
       "font": { "size": 50, "weight": 600 },
       "alignment": "left",
       "color": "#33D17A",
