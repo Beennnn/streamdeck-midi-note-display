@@ -59,6 +59,33 @@ See [`images/keyboard-icons/`](images/keyboard-icons/).
 
 ---
 
+## Placing note + octave together (custom layout)
+
+By default the letter sits top-centre and the octave lands elsewhere — they don't
+read as one token. Gunnar's tip fixes this: a **custom layout** JSON gives every
+object an explicit `rect` (`[x, y, w, h]` on a 200×100 canvas) and an
+**`alignment`**, so you place the note letter and the octave side by side as a
+single **`G♯3`** unit, with the piano pinned to the right.
+
+![G♯3 — letter + octave as one unit, keyboard on the right](images/vision/dial-Gsharp3.png)
+
+The trick that keeps it clean (see [`layouts/ts_note_split.json`](layouts/ts_note_split.json)):
+
+- **`note_letter`** — `alignment: "right"`, its box ends at the seam (`x = 90`).
+  The letter grows *leftward*, so a wide `G♯` and a narrow `C` both end at the same x.
+- **`note_octave`** — `alignment: "left"`, its box starts at the seam (`x = 92`).
+  Fixed x ⇒ the octave never jumps when the accidental changes width (this is the
+  old "keep them in separate fields" gotcha, now solved by geometry instead of luck).
+- **`keyboard`** — a `pixmap` pinned on the right (`x = 108`).
+
+The script loads the layout with `{layout:…}` and feeds the three objects by key
+(`{@note_letter:…}`, `{@note_octave:…}`, `{@keyboard:…}`) — full version in
+[`midiscript/split_note_dial_custom_layout.midiscript`](midiscript/split_note_dial_custom_layout.midiscript).
+Copy `ts_note_split.json` into `~/Documents/Trevliga Spel/Layouts/`, then adjust the
+`rect`/`font` values to taste — they're starting points, nudge them on-device.
+
+---
+
 ## Gotchas learned the hard way
 
 - **Sharp must be `♯` (U+266F), NOT ASCII `#`.** A literal `#` inside a note name
@@ -72,8 +99,11 @@ See [`images/keyboard-icons/`](images/keyboard-icons/).
   enlarges the static on/off **state** icon (an XML, not per value) — not a
   per-value keyboard. A big per-value image needs a **key** (`{image:}` fills the
   face). A key, though, can't do +/- — so for a split you stay on the dial.
-- Wishlist / feature request sent to the author: let `{title}` **and** `{text}`
-  both sit on the left, next to the keyboard.
+- **Placing letter + octave freely — solved with a custom layout.** I originally
+  filed this as a wishlist ("let title *and* text both sit on the left, next to the
+  keyboard"). Gunnar (the plugin author) pointed out it's already possible: each
+  display object's position is set by its own `rect` + **`alignment`** in a
+  **custom layout** JSON. See [Placing note + octave together](#placing-note--octave-together-custom-layout) below.
 
 ---
 
@@ -90,7 +120,12 @@ Then, in Stream Deck:
 1. Copy `images/keyboard-icons/` into `~/Documents/Trevliga Spel/keyboard-icons/`.
 2. Add a **Scripted Dial** (Trevliga Spel > Midi), paste
    `midiscript/split_note_dial.midiscript`, adjust CC/channel + the icon path.
-3. (or the translation-file route: a **Cycle key** with `translation-files/…xml`.)
+3. **Letter + octave together?** Copy `layouts/ts_note_split.json` into
+   `~/Documents/Trevliga Spel/Layouts/` and use
+   `midiscript/split_note_dial_custom_layout.midiscript` instead — it loads that
+   layout and drives its objects by key. (See
+   [Placing note + octave together](#placing-note--octave-together-custom-layout).)
+4. (or the translation-file route: a **Cycle key** with `translation-files/…xml`.)
 
 Fonts: images use a system font that includes `♯` (e.g. *Arial Unicode*).
 
@@ -102,4 +137,5 @@ Fonts: images use a system font that includes `♯` (e.g. *Arial Unicode*).
   https://forum.trevligaspel.se/t/feature-request-note-value-display-for-the-generic-button-show-a-midi-value-as-c4/124
 - Trevliga Spel MIDI plugin: https://trevligaspel.se/streamdeck/midi/
 
-Thanks to **Gunnar** (Trevliga Spel) for the plugin and the translation-file pointer.
+Thanks to **Gunnar** (Trevliga Spel) for the plugin, the translation-file pointer,
+and the custom-layout `alignment` tip that let me place the note + octave together.

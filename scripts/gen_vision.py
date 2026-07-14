@@ -33,40 +33,49 @@ def draw_keyboard(d, x0, y0, x1, y1, n):
         d.rounded_rectangle([bx,y0,bx+bw,y0+bh], radius=3,
             fill=LIT if (not hlW and ni==n) else BLACK, outline=BORD, width=3)
 
+# --- Geometry mirrors the custom layout ts_note_split.json (200x100 canvas) ---
+# note_letter: right-aligned to a fixed seam so the letter grows leftward;
+# note_octave: left-aligned from that same seam so the octave never moves;
+# keyboard:    pinned on the right. Result: the letter + octave read as one
+# "G#3" unit on the left, next to the piano. The seam is at x=90/200.
+SEAM = 90/200          # fraction of width where letter ends and octave begins
+
 def dial(value, W=1200, H=600, pad=28):
     n=value%12; octv=value//12-1
     img=Image.new("RGB",(W,H),BG); d=ImageDraw.Draw(img)
     d.rounded_rectangle([pad,pad,W-pad,H-pad], radius=40, fill=SCREEN, outline=BORD, width=4)
-    # note letter (left)
-    fL=f(300); lt=NOTES[n]; lb=d.textbbox((0,0),lt,font=fL)
-    d.text((90, 60-lb[1]), lt, font=fL, fill=LETTER)
-    # octave (right, flush)
-    fO=f(230); ot=str(octv); ob=d.textbbox((0,0),ot,font=fO)
-    d.text((W-100-(ob[2]-ob[0]), 90-ob[1]), ot, font=fO, fill=OCTAVE)
-    # keyboard (bottom)
-    draw_keyboard(d, 90, 360, W-90, H-70, n)
+    seam=int(W*SEAM); base=int(H*0.60)   # shared baseline for letter + octave
+    # note letter: right-aligned, ends at the seam (grows leftward)
+    fL=f(210); lt=NOTES[n]
+    d.text((seam, base), lt, font=fL, fill=LETTER, anchor="rs")
+    # octave: left-aligned, starts just after the seam (fixed x -> never shifts)
+    fO=f(150); ot=str(octv)
+    d.text((seam+14, base), ot, font=fO, fill=OCTAVE, anchor="ls")
+    # keyboard: pinned on the right, vertically centered
+    draw_keyboard(d, int(W*108/200), int(H*0.26), int(W*194/200), int(H*0.74), n)
     return img
 
-def layout(W=1200, H=780):
-    img=dial(61, W, 600); big=Image.new("RGB",(W,H),BG); big.paste(img,(0,0))
+def layout(W=1200, H=800):
+    img=dial(56, W, 600); big=Image.new("RGB",(W,H),BG); big.paste(img,(0,0))  # 56 = G#3
     d=ImageDraw.Draw(big); fa=f(30, bold=False)
-    # leader lines to the three elements
-    for start,tip in [((150,630),(230,150)),((150,675),(1010,170)),((150,720),(600,470))]:
+    # leader lines to the three elements (letter, octave, keyboard)
+    for start,tip in [((150,640),(430,340)),((150,685),(600,340)),((150,730),(880,300))]:
         d.line([start,tip], fill=MUTE, width=2)
         d.ellipse([tip[0]-6,tip[1]-6,tip[0]+6,tip[1]+6], fill=MUTE)
-    rows=[("{title}",  "= note letter   (formula on value % 12)", LETTER),
-          ("{text}",   "= octave        (INT(value/12)-1)",       OCTAVE),
-          ("{iconright}","= one piano image per note",            LIT)]
+    rows=[("{@note_letter}", "= note letter, right-aligned (formula on value % 12)", LETTER),
+          ("{@note_octave}", "= octave, left-aligned at a fixed x (INT(value/12)-1)", OCTAVE),
+          ("{@keyboard}",    "= one piano image per note, pinned right",            LIT)]
     for i,(a,b,col) in enumerate(rows):
-        y=618+i*45
+        y=628+i*45
         d.text((165,y), a, font=f(30), fill=col)
-        d.text((360,y), b, font=fa, fill=WHITE)
+        d.text((470,y), b, font=fa, fill=WHITE)
     return big
 
 if __name__=="__main__":
     out=os.path.join(os.path.dirname(__file__),"..","images","vision"); os.makedirs(out,exist_ok=True)
+    dial(56).save(os.path.join(out,"dial-Gsharp3.png"))   # G#3 (value 56) - the example
     dial(61).save(os.path.join(out,"dial-Csharp4.png"))   # C#4
-    dial(93).save(os.path.join(out,"dial-Fsharp6.png"))   # F#6-ish (93 = A6? -> just an example)
     dial(60).save(os.path.join(out,"dial-C4.png"))
+    dial(93).save(os.path.join(out,"dial-Fsharp6.png"))   # A6 example (wide/tall check)
     layout().save(os.path.join(out,"layout.png"))
     print("wrote vision images ->", out)

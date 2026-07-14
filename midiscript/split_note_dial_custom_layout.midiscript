@@ -1,0 +1,21 @@
+# Trevliga Spel MIDI plugin - Scripted Dial (CUSTOM LAYOUT variant)
+#
+# Same idea as split_note_dial.midiscript, but instead of relying on the
+# default title/text placement it loads a custom layout (ts_note_split.json)
+# so the note letter and the octave sit TOGETHER on the left as one "G#3"
+# unit, with the per-note piano on the right.
+#
+# This is Gunnar's tip from the forum thread put to use: a text object's
+# position is controlled by its own "rect" + "alignment" in the layout JSON.
+#   - note_letter : right-aligned to a fixed seam  -> the letter grows leftward,
+#                   so a wide "G#" and a narrow "C" both end at the same x
+#   - note_octave : left-aligned from that same seam -> the octave never moves
+#                   when the accidental changes width (the old alignment gotcha)
+#   - keyboard    : the per-note piano image, pinned on the right
+#
+# The sharp is the real glyph U+266F - a plain '#' would break the #...# parser.
+# Copy ts_note_split.json into  ~/Documents/Trevliga Spel/Layouts/  and adjust
+# the CC/channel + the icon path below for your own setup.
+
+[(init+)(cc:2,103,*){layout:%documents%/Trevliga Spel/Layouts/ts_note_split.json}{@note_letter.enabled:true}{@note_letter:#IF(@e_ccvalue%12=0,"C",IF(@e_ccvalue%12=1,"C♯",IF(@e_ccvalue%12=2,"D",IF(@e_ccvalue%12=3,"D♯",IF(@e_ccvalue%12=4,"E",IF(@e_ccvalue%12=5,"F",IF(@e_ccvalue%12=6,"F♯",IF(@e_ccvalue%12=7,"G",IF(@e_ccvalue%12=8,"G♯",IF(@e_ccvalue%12=9,"A",IF(@e_ccvalue%12=10,"A♯","B")))))))))))#}{@note_octave.enabled:true}{@note_octave:#INT(@e_ccvalue/12)-1#}{@keyboard.enabled:true}{@keyboard:%documents%/Trevliga Spel/keyboard-icons/kbd_#@e_ccvalue%12#.png}]
+[(rotate){cc:2,103,#@e_value#}{@note_letter:#IF(@e_value%12=0,"C",IF(@e_value%12=1,"C♯",IF(@e_value%12=2,"D",IF(@e_value%12=3,"D♯",IF(@e_value%12=4,"E",IF(@e_value%12=5,"F",IF(@e_value%12=6,"F♯",IF(@e_value%12=7,"G",IF(@e_value%12=8,"G♯",IF(@e_value%12=9,"A",IF(@e_value%12=10,"A♯","B")))))))))))#}{@note_octave:#INT(@e_value/12)-1#}{@keyboard:%documents%/Trevliga Spel/keyboard-icons/kbd_#@e_value%12#.png}]
