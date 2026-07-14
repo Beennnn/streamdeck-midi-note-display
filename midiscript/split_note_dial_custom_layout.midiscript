@@ -1,0 +1,29 @@
+# Trevliga Spel MIDI plugin - Scripted Dial (CUSTOM LAYOUT variant, pure MidiScript)
+#
+# Places the note letter and the octave together on the left as one "G#3" unit,
+# with the per-note piano on the right - by loading a custom layout and driving
+# its objects from the script. No JavaScript: {layout:...} and {@l_key...} are
+# standard MidiScript (see the plugin's "Custom layouts > Scripting" doc).
+#
+# HOW IT WORKS
+#   {layout:PATH}                 loads ts_note_split.json AND ticks the
+#                                 "Use a custom layout" checkbox automatically.
+#   {@l_note_letter.enabled:true} makes an object visible (objects ship disabled).
+#   {@l_note_letter:VALUE}        sets the object's value (text, or image path).
+# Object keys MUST start with "l_" so the script variables stay local to the dial.
+#
+# THE PLACEMENT (defined in ts_note_split.json via rect + alignment):
+#   l_note_letter : alignment "right", box ends at the seam (x=90) -> the letter
+#                   grows leftward, so a wide "G#" and a narrow "C" end at same x.
+#   l_note_octave : alignment "left", box starts at the seam (x=92) -> the octave
+#                   never shifts when the accidental changes width.
+#   l_keyboard    : the per-note piano image, pinned on the right (x=108).
+#
+# GOTCHAS (Stream Deck rejects the WHOLE layout on any of these):
+#   - any object extending beyond the 200x100 canvas;
+#   - two objects with the SAME zOrder overlapping (even by 1px).
+# The sharp is the real glyph U+266F - a plain '#' would break the #...# parser.
+# Adjust CC 103 / channel 2, the layout path, and the icon path for your setup.
+
+[(init+)(cc:2,103,*){layout:%documents%/Trevliga Spel/Layouts/ts_note_split.json}{@l_note_letter.enabled:true}{@l_note_octave.enabled:true}{@l_keyboard.enabled:true}{@l_note_letter:#IF(@e_ccvalue%12=0,"C",IF(@e_ccvalue%12=1,"C♯",IF(@e_ccvalue%12=2,"D",IF(@e_ccvalue%12=3,"D♯",IF(@e_ccvalue%12=4,"E",IF(@e_ccvalue%12=5,"F",IF(@e_ccvalue%12=6,"F♯",IF(@e_ccvalue%12=7,"G",IF(@e_ccvalue%12=8,"G♯",IF(@e_ccvalue%12=9,"A",IF(@e_ccvalue%12=10,"A♯","B")))))))))))#}{@l_note_octave:#INT(@e_ccvalue/12)-1#}{@l_keyboard:%documents%/Trevliga Spel/keyboard-icons/kbd_#@e_ccvalue%12#.png}]
+[(rotate){cc:2,103,#@e_value#}{@l_note_letter:#IF(@e_value%12=0,"C",IF(@e_value%12=1,"C♯",IF(@e_value%12=2,"D",IF(@e_value%12=3,"D♯",IF(@e_value%12=4,"E",IF(@e_value%12=5,"F",IF(@e_value%12=6,"F♯",IF(@e_value%12=7,"G",IF(@e_value%12=8,"G♯",IF(@e_value%12=9,"A",IF(@e_value%12=10,"A♯","B")))))))))))#}{@l_note_octave:#INT(@e_value/12)-1#}{@l_keyboard:%documents%/Trevliga Spel/keyboard-icons/kbd_#@e_value%12#.png}]

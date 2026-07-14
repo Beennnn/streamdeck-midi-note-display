@@ -78,26 +78,23 @@ The trick that keeps it clean (see [`layouts/ts_note_split.json`](layouts/ts_not
   old "keep them in separate fields" gotcha, now solved by geometry instead of luck).
 - **`keyboard`** — a `pixmap` pinned on the right (`x = 108`).
 
-**Enabling it (this is the part that bites):** the layout is *not* selected from
-the script. In the dial's **Property Inspector → Custom layout → tick "Use a
-custom layout" → "Layout file"**, browse to `ts_note_split.json`. If the box is
-unchecked, nothing changes; Stream Deck also silently ignores the file on the
-slightest JSON error.
+**It's pure MidiScript — no JavaScript needed.** `{layout:…}` and `{@l_key…}` are
+standard MidiScript actions ([plugin docs: Custom layouts → Scripting](https://trevligaspel.se/streamdeck/midi/index.php/script/midiscript/custom-layouts/custom-layouts-scripting)):
 
-**Filling custom object keys needs the JS engine.** The plugin's MidiScript
-`{title}`/`{text}`/`{iconright}` only populate the *built-in* layout objects — they
-can't fill custom keys like `note_letter`. Custom-key layouts are driven by the
-bundled **JavaScript API** (`layout.load(…)` + `layout.<key>.value(…)`), documented
-in the plugin's `streamdeck-midi.d.ts`. Full script:
-[`midiscript/split_note_dial_custom_layout.js`](midiscript/split_note_dial_custom_layout.js).
-Copy `ts_note_split.json` into `~/Documents/Trevliga Spel/Layouts/`, then nudge the
-`rect`/`font` values on-device — they're starting points.
+- `{layout:PATH}` loads the JSON **and** ticks the "Use a custom layout" checkbox.
+- Because the layout uses its *own* object keys (not the plugin's built-in ones),
+  nothing auto-populates them — the script enables and fills each one:
+  `{@l_note_letter.enabled:true}` then `{@l_note_letter:G♯}`, etc.
+- **Object keys must start with `l_`** so the script variables stay *local* to the
+  dial (a key without the prefix becomes a global variable).
 
-*(Prefer to keep your MidiScript untouched? The alternative is a custom layout that
-reuses the built-in object keys — e.g. `l_toptext_right_icon_present` for the title,
-`l_state_icon_right` for the piano — repositioned via their `rect`/`alignment`. Then
-`{title}`/`{text}`/`{iconright}` keep populating them. That path depends on the
-plugin's internal key mapping, so verify which objects your dial actually uses.)*
+Full script: [`midiscript/split_note_dial_custom_layout.midiscript`](midiscript/split_note_dial_custom_layout.midiscript).
+Copy `ts_note_split.json` into `~/Documents/Trevliga Spel/Layouts/`, paste the
+script into the dial, and adjust the CC/channel + paths.
+
+**Two rejection traps** — Stream Deck silently ignores the *entire* layout if any
+object extends beyond the **200×100 canvas**, or if two objects with the **same
+`zOrder`** overlap (even by one pixel). Give every object a distinct `zOrder`.
 
 ---
 
@@ -136,9 +133,10 @@ Then, in Stream Deck:
 2. Add a **Scripted Dial** (Trevliga Spel > Midi), paste
    `midiscript/split_note_dial.midiscript`, adjust CC/channel + the icon path.
 3. **Letter + octave together?** Copy `layouts/ts_note_split.json` into
-   `~/Documents/Trevliga Spel/Layouts/`, tick **"Use a custom layout"** and select
-   it, then paste `midiscript/split_note_dial_custom_layout.js` as the (JavaScript)
-   script — it loads the layout and fills its objects. (See
+   `~/Documents/Trevliga Spel/Layouts/` and use
+   `midiscript/split_note_dial_custom_layout.midiscript` instead — its `{layout:…}`
+   action loads the layout (and ticks "Use a custom layout") and its `{@l_…}` actions
+   fill the objects. (See
    [Placing note + octave together](#placing-note--octave-together-custom-layout).)
 4. (or the translation-file route: a **Cycle key** with `translation-files/…xml`.)
 
