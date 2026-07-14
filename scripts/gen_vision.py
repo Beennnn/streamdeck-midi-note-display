@@ -38,22 +38,21 @@ def draw_keyboard(d, x0, y0, x1, y1, n):
 # note_octave: left-aligned from that same seam so the octave never moves;
 # keyboard:    pinned on the right. Result: the letter + octave read as one
 # "G#3" unit on the left, next to the piano. The seam is at x=90/200.
-SEAM = 89/200          # fraction of width where letter ends and octave begins
-                       # (matches layouts/ts_note_split.json: letter rect ends x=88,
-                       #  octave rect starts x=90, keyboard pinned at x=122)
+SEAM = 60/200          # fraction of width where letter ends and octave begins
+                       # (matches layouts/ts_note_split.json: letter rect ends x=60,
+                       #  octave rect starts x=62, keyboard pinned at x=122)
 
 def dial(value, W=1200, H=600, pad=28):
     n=value%12; octv=value//12-1
     img=Image.new("RGB",(W,H),BG); d=ImageDraw.Draw(img)
     d.rounded_rectangle([pad,pad,W-pad,H-pad], radius=40, fill=SCREEN, outline=BORD, width=4)
-    seam=int(W*SEAM); base=int(H*0.68)   # shared baseline for letter + octave
-    # note letter: BIG, right-aligned, ends at the seam (grows leftward to fill the
-    # whole space left of the piano)
-    fL=f(345); lt=NOTES[n]
-    d.text((seam, base), lt, font=fL, fill=LETTER, anchor="rs")
-    # octave: left-aligned, starts right after the seam so it reads as one "F♯1" unit
-    fO=f(250); ot=str(octv)
-    d.text((seam+10, base), ot, font=fO, fill=OCTAVE, anchor="ls")
+    seam=int(W*SEAM); base=int(H*0.66)   # shared baseline for letter + octave
+    # letter and octave share the SAME size (the script forces .fontsize:44 on both)
+    fN=f(250)
+    # note letter: right-aligned, ends at the seam
+    d.text((seam, base), NOTES[n], font=fN, fill=LETTER, anchor="rs")
+    # octave: left-aligned, starts just after the seam -> reads as one tight "F♯0"
+    d.text((seam+10, base), str(octv), font=fN, fill=OCTAVE, anchor="ls")
     # keyboard: pinned on the right (x 122->196 of 200, y 18->82 of 100)
     draw_keyboard(d, int(W*122/200), int(H*0.18), int(W*196/200), int(H*0.82), n)
     return img
@@ -76,9 +75,9 @@ def layout(W=1200, H=800):
 
 if __name__=="__main__":
     out=os.path.join(os.path.dirname(__file__),"..","images","vision"); os.makedirs(out,exist_ok=True)
-    dial(56).save(os.path.join(out,"dial-Gsharp3.png"))   # G#3 (value 56) - the example
+    dial(18).save(os.path.join(out,"dial-Fsharp0.png"))   # F#0 (value 18) - tight-seam example
+    dial(56).save(os.path.join(out,"dial-Gsharp3.png"))   # G#3 (value 56)
     dial(61).save(os.path.join(out,"dial-Csharp4.png"))   # C#4
     dial(60).save(os.path.join(out,"dial-C4.png"))
-    dial(93).save(os.path.join(out,"dial-Fsharp6.png"))   # A6 example (wide/tall check)
     layout().save(os.path.join(out,"layout.png"))
     print("wrote vision images ->", out)
