@@ -1,30 +1,27 @@
 # Trevliga Spel MIDI plugin - Scripted Dial (CUSTOM LAYOUT variant, pure MidiScript)
 #
-# Places the note letter and the octave together on the left as one "G#3" unit,
-# with the per-note piano on the right - by driving the objects of a custom
-# layout (ts_note_split.json) from the script. No JavaScript.
+# Places the note letter and the octave together, with the per-note piano, by
+# driving a custom layout (ts_note_split.json) from the script. No JavaScript.
 #
-# ENABLE THE LAYOUT FIRST (in the dial's Property Inspector):
-#   Custom layout -> tick "Use a custom layout" -> "Layout file" -> pick
-#   ts_note_split.json. (Alternatively add {layout:PATH} as the first action -
-#   it loads the file AND ticks the box - but then PATH must be exact.)
+# ENABLE THE LAYOUT: Property Inspector -> Custom layout -> tick "Use a custom
+# layout" -> "Layout file" -> pick layouts/ts_note_split.json FROM YOUR GIT CLONE
+# (single source of truth, versioned - not a loose copy in Documents).
 #
-# WHY THIS SCRIPT AND NOT {title}/{text}/{iconright}:
-#   {title}/{text}/{iconright} populate the plugin's BUILT-IN object keys
-#   (l_toptext_*, l_state_icon_right, ...). This custom layout defines its OWN
-#   keys, so those commands would target objects that don't exist -> blank
-#   screen. Custom objects are driven by same-named script variables instead:
+# WHY {@l_...} AND NOT {title}/{text}/{iconright}:
+#   {title}/{text}/{iconright} populate the plugin's BUILT-IN object keys, absent
+#   from this custom layout -> blank screen. Custom objects are driven by
+#   same-named script variables. Keys MUST start with "l_" (local to the dial):
 #     {@l_note_letter.enabled:true}   makes an object visible (ships disabled)
+#     {@l_note_letter.font:64,700}    FIXES the font (size,weight) - see note
 #     {@l_note_letter:VALUE}          sets its value (text, or image path)
-#   Keys MUST start with "l_" so the variables stay local to the dial.
 #
-# PLACEMENT lives in ts_note_split.json (rect + alignment):
-#   l_note_letter : alignment "right", box ends at the seam (x=90)
-#   l_note_octave : alignment "left",  box starts at the seam (x=92) - fixed x
-#   l_keyboard    : per-note piano image, pinned right (x=108)
+# FONT SIZE MUST BE SET HERE, NOT IN THE JSON: for text objects the plugin
+# auto-fits the size to the box and IGNORES the "font" in the layout file. The
+# only way to force a fixed size is the .font (or .fontsize) script action.
 #
-# Adjust CC 103 / channel 2 and the icon folder for your setup. The sharp is the
-# real glyph U+266F - a plain '#' would break the #...# parser.
+# PATHS point into the git clone so everything stays versioned. Adjust the clone
+# path, CC 103 / channel 2 for your setup. Sharp = U+266F (a plain '#' breaks the
+# #...# parser).
 
-[(init+)(cc:2,103,*){@l_note_letter.enabled:true}{@l_note_octave.enabled:true}{@l_keyboard.enabled:true}{@l_note_letter:#IF(@e_ccvalue%12=0,"C",IF(@e_ccvalue%12=1,"C♯",IF(@e_ccvalue%12=2,"D",IF(@e_ccvalue%12=3,"D♯",IF(@e_ccvalue%12=4,"E",IF(@e_ccvalue%12=5,"F",IF(@e_ccvalue%12=6,"F♯",IF(@e_ccvalue%12=7,"G",IF(@e_ccvalue%12=8,"G♯",IF(@e_ccvalue%12=9,"A",IF(@e_ccvalue%12=10,"A♯","B")))))))))))#}{@l_note_octave:#INT(@e_ccvalue/12)-1#}{@l_keyboard:%documents%/Trevliga Spel/keyboard-icons/kbd_#@e_ccvalue%12#.png}]
-[(rotate){cc:2,103,#@e_value#}{@l_note_letter:#IF(@e_value%12=0,"C",IF(@e_value%12=1,"C♯",IF(@e_value%12=2,"D",IF(@e_value%12=3,"D♯",IF(@e_value%12=4,"E",IF(@e_value%12=5,"F",IF(@e_value%12=6,"F♯",IF(@e_value%12=7,"G",IF(@e_value%12=8,"G♯",IF(@e_value%12=9,"A",IF(@e_value%12=10,"A♯","B")))))))))))#}{@l_note_octave:#INT(@e_value/12)-1#}{@l_keyboard:%documents%/Trevliga Spel/keyboard-icons/kbd_#@e_value%12#.png}]
+[(init+)(cc:2,103,*){@l_note_letter.enabled:true}{@l_note_octave.enabled:true}{@l_keyboard.enabled:true}{@l_note_letter.font:64,700}{@l_note_octave.font:48,600}{@l_note_letter:#IF(@e_ccvalue%12=0,"C",IF(@e_ccvalue%12=1,"C♯",IF(@e_ccvalue%12=2,"D",IF(@e_ccvalue%12=3,"D♯",IF(@e_ccvalue%12=4,"E",IF(@e_ccvalue%12=5,"F",IF(@e_ccvalue%12=6,"F♯",IF(@e_ccvalue%12=7,"G",IF(@e_ccvalue%12=8,"G♯",IF(@e_ccvalue%12=9,"A",IF(@e_ccvalue%12=10,"A♯","B")))))))))))#}{@l_note_octave:#INT(@e_ccvalue/12)-1#}{@l_keyboard:/Users/benoitbesson/dev/music/streamdeck-midi-note-display/images/keyboard-icons/kbd_#@e_ccvalue%12#.png}]
+[(rotate){cc:2,103,#@e_value#}{@l_note_letter:#IF(@e_value%12=0,"C",IF(@e_value%12=1,"C♯",IF(@e_value%12=2,"D",IF(@e_value%12=3,"D♯",IF(@e_value%12=4,"E",IF(@e_value%12=5,"F",IF(@e_value%12=6,"F♯",IF(@e_value%12=7,"G",IF(@e_value%12=8,"G♯",IF(@e_value%12=9,"A",IF(@e_value%12=10,"A♯","B")))))))))))#}{@l_note_octave:#INT(@e_value/12)-1#}{@l_keyboard:/Users/benoitbesson/dev/music/streamdeck-midi-note-display/images/keyboard-icons/kbd_#@e_value%12#.png}]
