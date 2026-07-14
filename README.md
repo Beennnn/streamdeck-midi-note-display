@@ -8,7 +8,14 @@ My use case: a **keyboard split point** sent as `CC 103 / channel 2`. On stage
 "split at 60" means nothing; **"C4"** (with the key lit on a mini-keyboard) reads
 instantly.
 
-![On the dial](images/samples/on-device.png)
+![Note name + piano on the dial](images/vision/dial-Csharp4.png)
+
+*Clean render of the dial display — split point at C♯4. (Actual on-device screen is
+tiny/low-res; these are high-res mockups. See `images/vision/`.)*
+
+**How the display is built** — three fields, all driven from the raw MIDI value:
+
+![Layout](images/vision/layout.png)
 
 ---
 
