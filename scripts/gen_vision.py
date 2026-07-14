@@ -38,21 +38,24 @@ def draw_keyboard(d, x0, y0, x1, y1, n):
 # note_octave: left-aligned from that same seam so the octave never moves;
 # keyboard:    pinned on the right. Result: the letter + octave read as one
 # "G#3" unit on the left, next to the piano. The seam is at x=90/200.
-SEAM = 90/200          # fraction of width where letter ends and octave begins
+SEAM = 89/200          # fraction of width where letter ends and octave begins
+                       # (matches layouts/ts_note_split.json: letter rect ends x=88,
+                       #  octave rect starts x=90, keyboard pinned at x=122)
 
 def dial(value, W=1200, H=600, pad=28):
     n=value%12; octv=value//12-1
     img=Image.new("RGB",(W,H),BG); d=ImageDraw.Draw(img)
     d.rounded_rectangle([pad,pad,W-pad,H-pad], radius=40, fill=SCREEN, outline=BORD, width=4)
-    seam=int(W*SEAM); base=int(H*0.60)   # shared baseline for letter + octave
-    # note letter: right-aligned, ends at the seam (grows leftward)
-    fL=f(210); lt=NOTES[n]
+    seam=int(W*SEAM); base=int(H*0.68)   # shared baseline for letter + octave
+    # note letter: BIG, right-aligned, ends at the seam (grows leftward to fill the
+    # whole space left of the piano)
+    fL=f(345); lt=NOTES[n]
     d.text((seam, base), lt, font=fL, fill=LETTER, anchor="rs")
-    # octave: left-aligned, starts just after the seam (fixed x -> never shifts)
-    fO=f(150); ot=str(octv)
-    d.text((seam+14, base), ot, font=fO, fill=OCTAVE, anchor="ls")
-    # keyboard: pinned on the right, vertically centered
-    draw_keyboard(d, int(W*108/200), int(H*0.26), int(W*194/200), int(H*0.74), n)
+    # octave: left-aligned, starts right after the seam so it reads as one "F♯1" unit
+    fO=f(250); ot=str(octv)
+    d.text((seam+10, base), ot, font=fO, fill=OCTAVE, anchor="ls")
+    # keyboard: pinned on the right (x 122->196 of 200, y 18->82 of 100)
+    draw_keyboard(d, int(W*122/200), int(H*0.18), int(W*196/200), int(H*0.82), n)
     return img
 
 def layout(W=1200, H=800):
