@@ -1,0 +1,8 @@
+# Trevliga Spel MIDI plugin - Scripted Dial
+# Shows a MIDI value (e.g. a keyboard split point on CC 103 / ch 2) as:
+#   note letter (title) + octave (text) + a per-note piano icon (right).
+# The sharp is the real glyph U+266F - a plain '#' would break the #...# parser.
+# Swap CC 103 / channel 2 and the icon path for your own.
+
+[(init+)(cc:2,103,*){title:#IF(@e_ccvalue%12=0,"C",IF(@e_ccvalue%12=1,"C♯",IF(@e_ccvalue%12=2,"D",IF(@e_ccvalue%12=3,"D♯",IF(@e_ccvalue%12=4,"E",IF(@e_ccvalue%12=5,"F",IF(@e_ccvalue%12=6,"F♯",IF(@e_ccvalue%12=7,"G",IF(@e_ccvalue%12=8,"G♯",IF(@e_ccvalue%12=9,"A",IF(@e_ccvalue%12=10,"A♯","B")))))))))))#}{text:#INT(@e_ccvalue/12)-1#}{iconright:%documents%/Trevliga Spel/keyboard-icons/kbd_#@e_ccvalue%12#.png}]
+[(rotate){cc:2,103,#@e_value#}{title:#IF(@e_value%12=0,"C",IF(@e_value%12=1,"C♯",IF(@e_value%12=2,"D",IF(@e_value%12=3,"D♯",IF(@e_value%12=4,"E",IF(@e_value%12=5,"F",IF(@e_value%12=6,"F♯",IF(@e_value%12=7,"G",IF(@e_value%12=8,"G♯",IF(@e_value%12=9,"A",IF(@e_value%12=10,"A♯","B")))))))))))#}{text:#INT(@e_value/12)-1#}{iconright:%documents%/Trevliga Spel/keyboard-icons/kbd_#@e_value%12#.png}]
