@@ -1,13 +1,13 @@
 {
-  "id": "ts_note_split_borne_v2",
+  "id": "ts_note_split_borne_v3",
   "items": [
     {
       "key": "l_borne",
       "type": "text",
       "rect": [
-        0,
+        20,
         2,
-        96,
+        80,
         24
       ],
       "font": {
